@@ -26,7 +26,7 @@
                                         <input type="email" name="email" id="email" required><br><br>
                                         <label for="image">Unggah dan bagikan gambar anda.</label><br>
                                         <input type="file" name="image" id="image" accept=".jpg, .jpeg, .png" required><br><br>
-                                        <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY"></div>
+                                        <div class="g-recaptcha" data-sitekey=""></div>
                                         <br>
                                         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                                             <button type="submit" class="btn btn-primary btn-lg">MULAI MENGUNGGAH</button>
