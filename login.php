@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>File Upload</title>
 </head>
@@ -25,6 +26,8 @@
                                         <input type="email" name="email" id="email" required><br><br>
                                         <label for="image">Unggah dan bagikan gambar anda.</label><br>
                                         <input type="file" name="image" id="image" accept=".jpg, .jpeg, .png" required><br><br>
+                                        <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY"></div>
+                                        <br>
                                         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                                             <button type="submit" class="btn btn-primary btn-lg">MULAI MENGUNGGAH</button>
                                         </div>
