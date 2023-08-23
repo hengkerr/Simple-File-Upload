@@ -11,30 +11,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } if ($imageFileType !== "jpg" && $imageFileType !== "jpeg" && $imageFileType !== "png") {
         echo "Hanya gambar JPEG dan PNG!";
         exit;
-    } if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile)) {
-        $dbHost = "localhost";
-        $dbUsername = "root";
-        $dbPassword = "";
-        $dbName = "fileupload";
+    }
 
-        $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
+    $recaptchaSecret = "YOUR_SECRET_KEY"; // Ganti dengan kunci rahasia reCAPTCHA Anda
+    $response = $_POST['g-recaptcha-response'];
+    $remoteIp = $_SERVER['REMOTE_ADDR'];
 
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-        $stmt = $conn->prepare("INSERT INTO uploads (email, image_path) VALUES (?, ?)");
-        $stmt->bind_param("ss", $email, $targetFile);
+    $url = "https://www.google.com/recaptcha/api/siteverify";
+    $data = [
+        'secret' => $recaptchaSecret,
+        'response' => $response,
+        'remoteip' => $remoteIp
+    ];
 
-        if ($stmt->execute()) {
-            echo "File berhasil diunggah.";
+    $options = [
+        'http' => [
+            'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+            'method' => 'POST',
+            'content' => http_build_query($data)
+        ]
+    ];
+
+    $context = stream_context_create($options);
+    $result = file_get_contents($url, false, $context);
+    $resultData = json_decode($result);
+
+    if ($resultData->success) {
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile)) {
+            $dbHost = "localhost";
+            $dbUsername = "root";
+            $dbPassword = "";
+            $dbName = "fileupload";
+
+            $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
+
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+            $stmt = $conn->prepare("INSERT INTO uploads (email, image_path) VALUES (?, ?)");
+            $stmt->bind_param("ss", $email, $targetFile);
+
+            if ($stmt->execute()) {
+                echo "File berhasil diunggah.";
+            } else {
+                echo "Error storing data!";
+            }
+
+            $stmt->close();
+            $conn->close();
         } else {
-            echo "Error storing data!";
+            echo "Gagal Mengunggah File!";
         }
-
-        $stmt->close();
-        $conn->close();
     } else {
-        echo "Gagal Mengunggah File!";
+        echo "reCAPTCHA verification failed. Please try again.";
     }
 }
 ?>
