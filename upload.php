@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $recaptchaSecret = "YOUR_SECRET_KEY"; // Ganti dengan kunci rahasia reCAPTCHA Anda
+    $recaptchaSecret = "";
     $response = $_POST['g-recaptcha-response'];
     $remoteIp = $_SERVER['REMOTE_ADDR'];
 
