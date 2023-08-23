@@ -1,5 +1,19 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+$roles = [
+    'admin' => ['create', 'edit', 'delete'],
+    'editor' => ['create', 'edit'],
+    'viewer' => ['view'],
+];
+$user = [
+    'name' => 'William',
+    'role' => 'admin',
+];
+function hasPermission($userRole, $requiredPermission, $roles) {
+    if (isset($roles[$userRole]) && in_array($requiredPermission, $roles[$userRole])) {
+        return true;
+    }
+    return false;
+} if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
     $targetDir = "uploads/";
     $targetFile = $targetDir . basename($_FILES["image"]["name"]);
@@ -8,8 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         echo "Email tidak valid!";
         exit;
-    } if ($imageFileType !== "jpg" && $imageFileType !== "jpeg" && $imageFileType !== "png") {
-        echo "Hanya gambar JPEG dan PNG!";
+    } elseif (!in_array($imageFileType, ['jpg', 'jpeg', 'png'])) {
+        echo "Hanya gambar JPEG dan PNG yang diizinkan!";
         exit;
     }
 
@@ -36,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = file_get_contents($url, false, $context);
     $resultData = json_decode($result);
 
-    if ($resultData->success) {
+    if ($resultData->success && hasPermission($user['role'], 'create', $roles)) {
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile)) {
             $dbHost = "localhost";
             $dbUsername = "root";
@@ -48,6 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($conn->connect_error) {
                 die("Connection failed: " . $conn->connect_error);
             }
+
             $stmt = $conn->prepare("INSERT INTO uploads (email, image_path) VALUES (?, ?)");
             $stmt->bind_param("ss", $email, $targetFile);
 
@@ -63,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Gagal Mengunggah File!";
         }
     } else {
-        echo "reCAPTCHA verification failed. Please try again.";
+        echo "Permission denied or reCAPTCHA verification failed.";
     }
 }
 ?>
